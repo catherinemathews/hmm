@@ -59,9 +59,7 @@ def get_inputs():
 
     return validation_data, words_to_indices, tags_to_indices, hmminit, hmmemit, hmmtrans, args.predicted_file, args.metric_file
 
-# You should implement a logsumexp function that takes in either a vector or matrix
-# and performs the log-sum-exp trick on the vector, or on the rows of the matrix
-
+# takes in a matrix and performs the log-sum-exp trick on the rows of the matrix  
 def logsumexp(v):
     m = np.max(v, axis=1)
     res = np.zeros(len(v))
@@ -70,6 +68,7 @@ def logsumexp(v):
         res[i] = m[i] + np.log(np.sum(np.exp(v[i] - m[i])))
     return res
 
+# takes in a vector and performs the log-sum-exp trick on the vector 
 def logsumexp_vec(v):
     m = max(v)
     e = np.exp(v-m)
@@ -78,7 +77,7 @@ def logsumexp_vec(v):
 
 def forwardbackward(seq, loginit, logtrans, logemit, words_to_indices):
     """
-    Your implementation of the forward-backward algorithm.
+    Implementation of the forward-backward algorithm.
 
         seq is an input sequence, a list of words (represented as strings)
 
@@ -88,10 +87,9 @@ def forwardbackward(seq, loginit, logtrans, logemit, words_to_indices):
 
         logemit is a np.ndarray matrix containing the log of the emission matrix
     
-    You should compute the log-alpha and log-beta values and predict the tags for this sequence.
     """
-    T = len(seq) # number of words (T?)
-    J = len(loginit) # number of hidden states (J?)
+    T = len(seq) # number of words
+    J = len(loginit) # number of hidden states
     
     # Initialize log_alpha and fill it in
     log_alpha = np.zeros((T, J))
@@ -115,7 +113,7 @@ def forwardbackward(seq, loginit, logtrans, logemit, words_to_indices):
     # Compute the predicted tags for the sequence 
     probs = log_alpha + log_beta
     tags = np.argmax(probs, axis=1)
-    # Compute the log-probability of the sequence - how 
+    # Compute the log-probability of the sequence
     log_prob = logsumexp_vec(log_alpha[T-1, :])
     # Return the predicted tags and the log-probability
     return tags, log_prob
@@ -189,7 +187,3 @@ if __name__ == "__main__":
         met_out.write("Accuracy: ")
         met_out.write(str(accuracy))
 
-
-# python forwardbackward.py toy_data/validation.txt toy_data/index_to_word.txt toy_data/index_to_tag.txt toy_data/hmminit.txt toy_data/hmmemit.txt toy_data/hmmtrans.txt toy_data/predicted.txt toy_data/metrics.txt
-# python forwardbackward.py en_data/validation.txt en_data/index_to_word.txt en_data/index_to_tag.txt en_data/hmminit.txt en_data/hmmemit.txt en_data/hmmtrans.txt en_data/predicted.txt en_data/metrics.txt
-# python forwardbackward.py fr_data/validation.txt fr_data/index_to_word.txt fr_data/index_to_tag.txt fr_data/hmminit.txt fr_data/hmmemit.txt fr_data/hmmtrans.txt fr_data/predicted.txt fr_data/metrics.txt
